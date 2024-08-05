@@ -37,9 +37,9 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-//    @Validated(Marker.Update.class)
     UserDto update(@NotNull
-                   @Positive Long id,
+                   @Positive
+                   @PathVariable Long id,
                    @RequestBody
                    @Valid UserDto userDto) {
         userDto.setId(id);

@@ -9,9 +9,9 @@ public class UserMapper implements Mapper<User, UserDto> {
     @Override
     public UserDto ModelToDto(User user) {
         UserDto userDto = new UserDto();
-        userDto.setId(userDto.getId());
-        userDto.setName(userDto.getName());
-        userDto.setEmail(userDto.getEmail());
+        userDto.setId(user.getId());
+        userDto.setName(user.getName());
+        userDto.setEmail(user.getEmail());
         return userDto;
     }
 

@@ -3,21 +3,16 @@ package ru.practicum.shareit.user;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import ru.practicum.shareit.Marker;
 
 @Data
 public class UserDto {
-    @Null(groups = Marker.Create.class)
-    @NotNull(groups = Marker.Update.class)
-    @NotNull(groups = Marker.Delete.class)
-    @Positive(groups = Marker.Update.class)
-    @Positive(groups = Marker.Delete.class)
+    @Null
     private Long id;
-    @NotNull
+    @NotNull(groups = Marker.Create.class)
     private String name;
-    @NotNull
-    @Email
+    @NotNull(groups = Marker.Create.class)
+    @Email(groups = Marker.Create.class)
     private String email;
 }
