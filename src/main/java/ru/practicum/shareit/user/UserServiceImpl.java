@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
@@ -31,8 +33,8 @@ public class UserServiceImpl implements UserService {
         if (exists(userDto.getEmail())) {
             throw new EmailAlreadyExistException("This email = " + userDto.getEmail() + " already exists");
         }
-        User user = userMapper.DtoToModel(userDto);
-        return userMapper.ModelToDto(userRepository.save(user));
+        User user = userMapper.dtoToModel(userDto);
+        return userMapper.modelToDto(userRepository.save(user));
     }
 
     @Override
@@ -43,8 +45,8 @@ public class UserServiceImpl implements UserService {
         if (exists(userDto.getEmail())) {
             throw new EmailAlreadyExistException("This email = " + userDto.getEmail() + " already exists");
         }
-        User user = userMapper.DtoToModel(userDto);
-        return userMapper.ModelToDto(userRepository.update(user));
+        User user = userMapper.dtoToModel(userDto);
+        return userMapper.modelToDto(userRepository.update(user));
     }
 
     @Override
@@ -52,13 +54,13 @@ public class UserServiceImpl implements UserService {
         if (!exists(id)) {
             throw new NotFoundException("User not found with id: " + id);
         }
-        return userMapper.ModelToDto(userRepository.get(id));
+        return userMapper.modelToDto(userRepository.get(id));
     }
 
     @Override
     public List<UserDto> getAll() {
         return userRepository.getAll().stream()
-                .map(userMapper::ModelToDto)
+                .map(userMapper::modelToDto)
                 .toList();
     }
 

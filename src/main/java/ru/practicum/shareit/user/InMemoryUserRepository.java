@@ -1,12 +1,15 @@
 package ru.practicum.shareit.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Repository("memory")
+@Slf4j
 public class InMemoryUserRepository implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
     private long maxId;
@@ -24,8 +27,10 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
+        log.info("==> Saving user {}", user);
         user.setId(createId());
         users.put(user.getId(), user);
+        log.info("<== Saving user {}", user);
         return user;
     }
 

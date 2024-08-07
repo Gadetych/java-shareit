@@ -1,7 +1,7 @@
 package ru.practicum.shareit;
 
-public interface Mapper <M, D> {
-    D ModelToDto(M model);
+public interface Mapper<M, D> {
+    D modelToDto(M model);
 
-    M DtoToModel(D dto);
+    M dtoToModel(D dto);
 }
