@@ -36,6 +36,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User update(User user) {
+        log.info("==> Updating user {}", user);
         User oldUser = users.get(user.getId());
         String name = user.getName();
         if (name != null) {
@@ -45,22 +46,31 @@ public class InMemoryUserRepository implements UserRepository {
         if (email != null) {
             oldUser.setEmail(email);
         }
+        log.info("<== Updating user {}", user);
         return oldUser;
     }
 
     @Override
     public User get(Long id) {
-        return users.get(id);
+        log.info("==> Getting user id = {}", id);
+        User user = users.get(id);
+        log.info("<== Getting user {}", user);
+        return user;
     }
 
     @Override
     public List<User> getAll() {
-        return (List<User>) users.values();
+        log.info("==> Getting all users");
+        List<User> result = (List<User>) users.values();
+        log.info("<== Getting all users");
+        return result;
     }
 
     @Override
     public void delete(Long id) {
+        log.info("==> Deleting user with id = {}", id);
         users.remove(id);
+        log.info("<== Deleted user with id = {}", id);
     }
 
     private long createId() {
