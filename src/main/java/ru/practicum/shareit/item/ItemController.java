@@ -30,10 +30,11 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
     private final ItemRequestController itemRequestController;
+    private final String REQUEST_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     @Validated(Marker.Create.class)
-    public ItemDto create(@RequestHeader("X-Sharer-User-Id")
+    public ItemDto create(@RequestHeader(REQUEST_HEADER)
                           @NotNull
                           @Positive Long ownerId,
                           @RequestBody
@@ -43,7 +44,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@RequestHeader("X-Sharer-User-Id")
+    public ItemDto update(@RequestHeader(REQUEST_HEADER)
                           @NotNull
                           @Positive Long ownerId,
                           @PathVariable
@@ -57,7 +58,7 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto get(@RequestHeader("X-Sharer-User-Id")
+    public ItemDto get(@RequestHeader(REQUEST_HEADER)
                        @NotNull
                        @Positive Long ownerId,
                        @PathVariable
@@ -67,14 +68,14 @@ public class ItemController {
     }
 
     @GetMapping
-    List<ItemDto> getAll(@RequestHeader("X-Sharer-User-Id")
+    List<ItemDto> getAll(@RequestHeader(REQUEST_HEADER)
                          @NotNull
                          @Positive Long ownerId) {
         return itemService.getAll(ownerId);
     }
 
     @GetMapping("/search")
-    List<ItemDto> search(@RequestHeader("X-Sharer-User-Id")
+    List<ItemDto> search(@RequestHeader(REQUEST_HEADER)
                          @NotNull
                          @Positive Long ownerId,
                          @RequestParam("text") String text) {
