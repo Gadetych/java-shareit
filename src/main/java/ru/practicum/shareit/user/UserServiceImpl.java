@@ -17,43 +17,38 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-
     @Override
-    public boolean exists(Long id) {
-        return userRepository.exists(id);
+    public void exists(Long id) {
+        if (!userRepository.exists(id)) {
+            throw new NotFoundException("User not found with id: " + id);
+        }
     }
 
     @Override
-    public boolean exists(String email) {
-        return userRepository.exists(email);
+    public void exists(String email) {
+        if (userRepository.exists(email)) {
+            throw new EmailAlreadyExistException("This email = " + email + " already exists");
+        }
     }
 
     @Override
     public UserDto save(UserDto userDto) {
-        if (exists(userDto.getEmail())) {
-            throw new EmailAlreadyExistException("This email = " + userDto.getEmail() + " already exists");
-        }
+        exists(userDto.getEmail());
         User user = userMapper.dtoToModel(userDto);
         return userMapper.modelToDto(userRepository.save(user));
     }
 
     @Override
     public UserDto update(UserDto userDto) {
-        if (!exists(userDto.getId())) {
-            throw new NotFoundException("User not found with id: " + userDto.getId());
-        }
-        if (exists(userDto.getEmail())) {
-            throw new EmailAlreadyExistException("This email = " + userDto.getEmail() + " already exists");
-        }
+        exists(userDto.getId());
+        exists(userDto.getEmail());
         User user = userMapper.dtoToModel(userDto);
         return userMapper.modelToDto(userRepository.update(user));
     }
 
     @Override
     public UserDto get(Long id) {
-        if (!exists(id)) {
-            throw new NotFoundException("User not found with id: " + id);
-        }
+        exists(id);
         return userMapper.modelToDto(userRepository.get(id));
     }
 

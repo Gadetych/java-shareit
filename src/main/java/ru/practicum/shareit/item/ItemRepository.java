@@ -8,6 +8,8 @@ public interface ItemRepository {
 
     boolean exists(Long itemId);
 
+    boolean existsItemForUser(Long ownerId, Long itemId);
+
     Item save(Long ownerId, Item item);
 
     Item update(Long ownerId, Item item);

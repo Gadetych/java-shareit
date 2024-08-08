@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface UserService {
 
-    boolean exists(Long id);
+    void exists(Long id);
 
-    boolean exists(String email);
+    void exists(String email);
 
     UserDto save(UserDto userDto);
 

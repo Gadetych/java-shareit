@@ -27,18 +27,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto save(Long ownerId, ItemDto dto) {
-        if (!userService.exists(ownerId)) {
-            throw new NotFoundException("User not found with id " + ownerId);
-        }
+        userService.exists(ownerId);
         Item item = itemMapper.dtoToModel(dto);
         return itemMapper.modelToDto(itemRepository.save(ownerId, item));
     }
 
     @Override
     public ItemDto update(Long ownerId, ItemDto dto) {
-        if (!userService.exists(ownerId)) {
-            throw new NotFoundException("User not found with id " + ownerId);
+        if (!itemRepository.existsItemForUser(ownerId, dto.getId())) {
+            throw new NotFoundException("Updating. Item id = " + dto.getId() + " not found for user id = " + ownerId);
         }
+        userService.exists(ownerId);
         if (!exists(dto.getId())) {
             throw new NotFoundException("Updating. Item not found with id " + dto.getId());
         }
@@ -48,9 +47,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto get(Long ownerId, Long id) {
-        if (!userService.exists(ownerId)) {
-            throw new NotFoundException("User not found with id " + ownerId);
-        }
+        userService.exists(ownerId);
         if (!exists(id)) {
             throw new NotFoundException("Getting. Item not found with id " + id);
         }
@@ -59,9 +56,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAll(Long ownerId) {
-        if (!userService.exists(ownerId)) {
-            throw new NotFoundException("User not found with id " + ownerId);
-        }
+        userService.exists(ownerId);
         return itemRepository.getAll(ownerId).stream()
                 .map(itemMapper::modelToDto)
                 .toList();
@@ -69,9 +64,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(Long ownerId, String text) {
-        if (!userService.exists(ownerId)) {
-            throw new NotFoundException("User not found with id " + ownerId);
-        }
+        userService.exists(ownerId);
         return itemRepository.search(ownerId, text).stream()
                 .map(itemMapper::modelToDto)
                 .toList();
