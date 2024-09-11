@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -13,20 +13,19 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Qualifier("memory")
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     @Override
     public void exists(Long id) {
-        if (!userRepository.exists(id)) {
+        if (!userRepository.existsById(id)) {
             throw new NotFoundException("User not found with id: " + id);
         }
     }
 
     @Override
     public void exists(String email) {
-        if (userRepository.exists(email)) {
+        if (userRepository.existsByUserEmail(email)) {
             throw new EmailAlreadyExistException("This email = " + email + " already exists");
         }
     }
@@ -42,25 +41,34 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserDto userDto) {
         exists(userDto.getId());
         exists(userDto.getEmail());
-        User user = userMapper.dtoToModel(userDto);
-        return userMapper.modelToDto(userRepository.update(user));
+        if (userDto.getName() != null && userDto.getEmail() == null) {
+            userRepository.updateUserName(userDto.getId(), userDto.getName());
+        }
+        if (userDto.getEmail() != null && userDto.getName() == null) {
+            userRepository.updateUserEmail(userDto.getId(), userDto.getEmail());
+        }
+        if (userDto.getName() != null && userDto.getEmail() != null) {
+            userRepository.updateUserNameAndEmail(userDto.getId(), userDto.getName(), userDto.getEmail());
+        }
+        return userMapper.modelToDto(userRepository.findById(userDto.getId()).get());
     }
 
     @Override
     public UserDto get(Long id) {
         exists(id);
-        return userMapper.modelToDto(userRepository.get(id));
+        return userMapper.modelToDto(userRepository.findById(id).get());
     }
 
     @Override
     public List<UserDto> getAll() {
-        return userRepository.getAll().stream()
+        Sort sortById = Sort.by(Sort.Direction.ASC, "id");
+        return userRepository.findAll(sortById).stream()
                 .map(userMapper::modelToDto)
                 .toList();
     }
 
     @Override
     public void delete(Long id) {
-        userRepository.delete(id);
+        userRepository.deleteById(id);
     }
 }

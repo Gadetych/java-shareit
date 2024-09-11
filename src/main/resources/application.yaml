@@ -1,0 +1,26 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/shereit
+    username: dbuser
+    password: 12345
+
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: INFO
+        transaction:
+          interceptor: TRACE
+          JpaTransactionManager: DEBUG

@@ -1,12 +1,33 @@
 package ru.practicum.shareit.booking;
 
+import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoCreate;
 
-/**
- * TODO Sprint add-bookings.
- */
 @RestController
 @RequestMapping(path = "/bookings")
+@RequiredArgsConstructor
+@Validated
 public class BookingController {
+    private final BookingService bookingService;
+    private final String requestHeader = "X-Sharer-User-Id";
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookingDto creat(@RequestBody BookingDtoCreate dtoCreate,
+                            @RequestHeader(value = requestHeader)
+                            @Positive
+                            long bookerId) {
+        dtoCreate.setBookerId(bookerId);
+        return bookingService.create(dtoCreate);
+    }
 }

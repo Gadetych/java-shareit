@@ -71,7 +71,7 @@ public class ItemController {
     List<ItemDto> getAll(@RequestHeader(requestHeader)
                          @NotNull
                          @Positive Long ownerId) {
-        return itemService.getAll(ownerId);
+        return itemService.findAllItemsByOwnerId(ownerId);
     }
 
     @GetMapping("/search")

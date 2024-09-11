@@ -2,7 +2,6 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -15,21 +14,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ItemServiceImpl implements ItemService {
-    @Qualifier("memory")
     private final ItemRepository itemRepository;
     private final UserService userService;
     private final ItemMapper itemMapper;
 
     @Override
     public boolean exists(Long itemId) {
-        return itemRepository.exists(itemId);
+        return itemRepository.existsById(itemId);
     }
 
     @Override
     public ItemDto save(Long ownerId, ItemDto dto) {
         userService.exists(ownerId);
+        dto.setOwnerId(ownerId);
         Item item = itemMapper.dtoToModel(dto);
-        return itemMapper.modelToDto(itemRepository.save(ownerId, item));
+        return itemMapper.modelToDto(itemRepository.save(item));
     }
 
     @Override
@@ -41,8 +40,17 @@ public class ItemServiceImpl implements ItemService {
         if (!exists(dto.getId())) {
             throw new NotFoundException("Updating. Item not found with id " + dto.getId());
         }
-        Item item = itemMapper.dtoToModel(dto);
-        return itemMapper.modelToDto(itemRepository.update(ownerId, item));
+        Item item = itemRepository.findById(dto.getId()).get();
+        if (dto.getName() != null) {
+            item.setName(dto.getName());
+        }
+        if (dto.getDescription() != null) {
+            item.setDescription(dto.getDescription());
+        }
+        if (dto.getAvailable() != null) {
+            item.setAvailable(dto.getAvailable());
+        }
+        return itemMapper.modelToDto(itemRepository.save(item));
     }
 
     @Override
@@ -51,13 +59,13 @@ public class ItemServiceImpl implements ItemService {
         if (!exists(id)) {
             throw new NotFoundException("Getting. Item not found with id " + id);
         }
-        return itemMapper.modelToDto(itemRepository.get(ownerId, id));
+        return itemMapper.modelToDto(itemRepository.findById(id).get());
     }
 
     @Override
-    public List<ItemDto> getAll(Long ownerId) {
+    public List<ItemDto> findAllItemsByOwnerId(Long ownerId) {
         userService.exists(ownerId);
-        return itemRepository.getAll(ownerId).stream()
+        return itemRepository.findAllItemsByOwnerId(ownerId).stream()
                 .map(itemMapper::modelToDto)
                 .toList();
     }
@@ -65,7 +73,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> search(Long ownerId, String text) {
         userService.exists(ownerId);
-        return itemRepository.search(ownerId, text).stream()
+        if (text == null || text.isBlank()) {
+            return List.of();
+        }
+        List<Item> result = itemRepository.findContaining(text);
+        return result.stream()
                 .map(itemMapper::modelToDto)
                 .toList();
     }
