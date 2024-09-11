@@ -5,5 +5,5 @@ import ru.practicum.shareit.booking.dto.BookingDtoCreate;
 
 public interface BookingService {
 
-    BookingDto create(BookingDtoCreate dtoCreate);
+    BookingDto save(BookingDtoCreate dtoCreate);
 }

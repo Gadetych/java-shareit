@@ -19,7 +19,7 @@ public class ShareItExceptionHandler {
         return exceptionDto;
     }
 
-    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class})
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class, UnavailableItemException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleBadRequest(RuntimeException e) {
         e.printStackTrace();

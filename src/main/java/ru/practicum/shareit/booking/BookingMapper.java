@@ -2,45 +2,42 @@ package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.Mapper;
-import ru.practicum.shareit.booking.dto.AccessStatusItem;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoCreate;
-import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingWithItemAndUser;
 import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.dto.UserDto;
 
 @Component
 @RequiredArgsConstructor
-public class BookingMapper implements Mapper<Booking, BookingDtoCreate> {
+public class BookingMapper {
     private final ItemMapper itemMapper;
+    private final UserMapper userMapper;
 
-    @Override
-    public BookingDtoCreate modelToDto(Booking model) {
+    public BookingDtoCreate modelToDto(BookingWithItemAndUser model) {
 
         return null;
     }
 
-    @Override
-    public Booking dtoToModel(BookingDtoCreate dto) {
-        Booking booking = new Booking();
-        booking.setStart(dto.getStart());
-        booking.setEnd(dto.getEnd());
-        Item item = new Item();
-        item.setId(dto.getItemId());
-        booking.setItem(item);
-        booking.setBookerId(dto.getBookerId());
-        booking.setStatus(AccessStatusItem.WAITING);
-        return booking;
+    public BookingWithItemAndUser dtoToModel(BookingDtoCreate dto, ItemDto itemDto, UserDto bookerDto) {
+        BookingWithItemAndUser model = new BookingWithItemAndUser();
+        model.setStart(dto.getStart());
+        model.setEnd(dto.getEnd());
+        model.setItem(itemMapper.dtoToModel(itemDto));
+        model.setBooker(userMapper.dtoToModel(bookerDto));
+        model.setStatus(dto.getStatus());
+        return model;
     }
 
-    public BookingDto modelToDtoResponse(Booking model) {
+    public BookingDto modelToDtoResponse(BookingWithItemAndUser model) {
         BookingDto dto = new BookingDto();
         dto.setId(model.getId());
         dto.setStart(model.getStart());
         dto.setEnd(model.getEnd());
         dto.setItem(itemMapper.modelToDto(model.getItem()));
-        dto.setBookerId(model.getBookerId());
+        dto.setBooker(userMapper.modelToDto(model.getBooker()));
         dto.setStatus(model.getStatus());
         return dto;
     }
