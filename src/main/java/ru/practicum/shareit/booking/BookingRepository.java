@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.AccessStatusItem;
 import ru.practicum.shareit.booking.model.Booking;
 
+import java.util.Optional;
+
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Modifying
     @Transactional
@@ -16,4 +18,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "select exists(select b.id from Booking b where b.id = :bookingId and b.item.id = :ownerId)")
     boolean existsByOwnerId(long bookingId, long ownerId);
+
+    @Query(value = "select b from Booking b where b.id = :bookingId and (b.booker.id = :userId or b.item.ownerId = :userId)")
+    Optional<Booking> findByBookingId(@Param("bookingId") long bookingId, @Param("userId") long userId);
 }

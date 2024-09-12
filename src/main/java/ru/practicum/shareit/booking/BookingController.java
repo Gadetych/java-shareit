@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,5 +48,15 @@ public class BookingController {
                                           @RequestParam
                                           boolean approved) {
         return bookingService.updateStatusBooking(bookingId, userId, approved);
+    }
+
+    @GetMapping("/{bookingId}")
+    public BookingDto getBooking(@PathVariable
+                                 @Positive
+                                 long bookingId,
+                                 @RequestHeader(value = requestHeader)
+                                 @Positive
+                                 long userId) {
+        return bookingService.get(bookingId, userId);
     }
 }

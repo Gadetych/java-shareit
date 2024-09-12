@@ -12,4 +12,6 @@ public interface BookingService {
     BookingDto save(BookingDtoCreate dtoCreate);
 
     BookingDto updateStatusBooking(long bookingId, long userId, boolean approved);
+
+    BookingDto get(long bookingId, long userId);
 }

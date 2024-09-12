@@ -8,9 +8,11 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoCreate;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.BookingAccessException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnavailableItemException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -22,12 +24,13 @@ public class BookingServiceImpl implements BookingService {
     private final ItemService itemService;
     private final UserService userService;
     private final BookingMapper bookingMapper;
+    private final UserRepository userRepository;
 
     @Override
     public void exists(long bookingId) {
-//        if (!bookingRepository.existsById(bookingId)) {
-//            throw new NotFoundException("Booking with id " + bookingId + " not found");
-//        }
+        if (!bookingRepository.existsById(bookingId)) {
+            throw new NotFoundException("Booking with id " + bookingId + " not found");
+        }
     }
 
     @Override
@@ -60,6 +63,13 @@ public class BookingServiceImpl implements BookingService {
         }
         bookingRepository.updateBooking(bookingId, ownerId, newStatus);
         return bookingMapper.modelToDtoResponse(bookingRepository.findById(bookingId).get());
+    }
+
+    @Override
+    public BookingDto get(long bookingId, long userId) {
+        exists(bookingId);
+        Booking result = bookingRepository.findByBookingId(bookingId, userId).orElseThrow(() -> new BookingAccessException("Denied access for user id = " + userId));
+        return bookingMapper.modelToDtoResponse(result);
     }
 
 }
