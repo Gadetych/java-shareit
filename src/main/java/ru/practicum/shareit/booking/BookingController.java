@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoCreate;
+import ru.practicum.shareit.booking.dto.BookingState;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
@@ -58,5 +61,14 @@ public class BookingController {
                                  @Positive
                                  long userId) {
         return bookingService.get(bookingId, userId);
+    }
+
+    @GetMapping
+    public List<BookingDto> getAllByBooker(@RequestHeader(value = requestHeader)
+                                           @Positive
+                                           long bookerId,
+                                           @RequestParam(defaultValue = "ALL")
+                                           BookingState state) {
+        return bookingService.getAllByBooker(bookerId, state);
     }
 }

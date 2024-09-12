@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.AccessStatusItem;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoCreate;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.BookingAccessException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -15,6 +16,10 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +75,25 @@ public class BookingServiceImpl implements BookingService {
         exists(bookingId);
         Booking result = bookingRepository.findByBookingId(bookingId, userId).orElseThrow(() -> new BookingAccessException("Denied access for user id = " + userId));
         return bookingMapper.modelToDtoResponse(result);
+    }
+
+    @Override
+    public List<BookingDto> getAllByBooker(long bookerId, BookingState state) {
+        List<Booking> modelList = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+        switch (state) {
+            case ALL -> modelList = bookingRepository.findAllByBookerId(bookerId);
+            case PAST -> modelList = bookingRepository.findAllByBookerIdAndEndBefore(bookerId, now);
+            case FUTURE -> modelList = bookingRepository.findAllByBookerIdAndStartAfter(bookerId, now);
+            case WAITING ->
+                    modelList = bookingRepository.findAllByBookerIdAndStatus(bookerId, AccessStatusItem.WAITING);
+            case REJECTED ->
+                    modelList = bookingRepository.findAllByBookerIdAndStatus(bookerId, AccessStatusItem.REJECT);
+            case CURRENT -> modelList = bookingRepository.findAllByBookerIdAndNowBetween(bookerId, now);
+        }
+        return modelList.stream()
+                .map(bookingMapper::modelToDtoResponse)
+                .toList();
     }
 
 }
