@@ -18,7 +18,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "update Booking b set b.status = :status where b.id = :bookingId and b.item.ownerId = :ownerId")
     void updateBooking(@Param("bookingId") long bookingId, @Param("ownerId") long ownerId, @Param("status") AccessStatusItem status);
 
-    @Query(value = "select exists(select b.id from Booking b where b.id = :bookingId and b.item.id = :ownerId)")
+    @Query(value = "select exists(select b.id from Booking b where b.id = :bookingId and b.item.ownerId = :ownerId)")
     boolean existsByOwnerId(long bookingId, long ownerId);
 
     @Query(value = "select b from Booking b where b.id = :bookingId and (b.booker.id = :userId or b.item.ownerId = :userId)")
@@ -34,4 +34,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query(value = "select b from Booking b where b.id = :bookerId and (:now between b.start and b.end)")
     List<Booking> findAllByBookerIdAndNowBetween(@Param("bookerId") long bookerId, @Param("now") LocalDateTime now);
+
+    List<Booking> findAllByItemOwnerId(long ownerId);
+
+    List<Booking> findAllByItemOwnerIdAndEndBefore(long ownerId, LocalDateTime now);
+
+    List<Booking> findAllByItemOwnerIdAndStartAfter(long ownerId, LocalDateTime now);
+
+    List<Booking> findAllByItemOwnerIdAndStatus(long ownerId, AccessStatusItem accessStatusItem);
+
+    @Query(value = "select b from Booking b where b.item.id = :ownerId and (:now between b.start and b.end)")
+    List<Booking> findAllByItemOwnerIdAndNowBetween(@Param("ownerId") long ownerId, @Param("now") LocalDateTime now);
 }

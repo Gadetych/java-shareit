@@ -18,7 +18,6 @@ import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -79,10 +78,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllByBooker(long bookerId, BookingState state) {
-        List<Booking> modelList = new ArrayList<>();
+        userService.exists(bookerId);
+        List<Booking> modelList;
         LocalDateTime now = LocalDateTime.now();
         switch (state) {
-            case ALL -> modelList = bookingRepository.findAllByBookerId(bookerId);
             case PAST -> modelList = bookingRepository.findAllByBookerIdAndEndBefore(bookerId, now);
             case FUTURE -> modelList = bookingRepository.findAllByBookerIdAndStartAfter(bookerId, now);
             case WAITING ->
@@ -90,6 +89,27 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED ->
                     modelList = bookingRepository.findAllByBookerIdAndStatus(bookerId, AccessStatusItem.REJECT);
             case CURRENT -> modelList = bookingRepository.findAllByBookerIdAndNowBetween(bookerId, now);
+            default -> modelList = bookingRepository.findAllByBookerId(bookerId);
+        }
+        return modelList.stream()
+                .map(bookingMapper::modelToDtoResponse)
+                .toList();
+    }
+
+    @Override
+    public List<BookingDto> getAllByOwner(long ownerId, BookingState state) {
+        userService.exists(ownerId);
+        List<Booking> modelList;
+        LocalDateTime now = LocalDateTime.now();
+        switch (state) {
+            case PAST -> modelList = bookingRepository.findAllByItemOwnerIdAndEndBefore(ownerId, now);
+            case FUTURE -> modelList = bookingRepository.findAllByItemOwnerIdAndStartAfter(ownerId, now);
+            case WAITING ->
+                    modelList = bookingRepository.findAllByItemOwnerIdAndStatus(ownerId, AccessStatusItem.WAITING);
+            case REJECTED ->
+                    modelList = bookingRepository.findAllByItemOwnerIdAndStatus(ownerId, AccessStatusItem.REJECT);
+            case CURRENT -> modelList = bookingRepository.findAllByItemOwnerIdAndNowBetween(ownerId, now);
+            default -> modelList = bookingRepository.findAllByItemOwnerId(ownerId);
         }
         return modelList.stream()
                 .map(bookingMapper::modelToDtoResponse)
