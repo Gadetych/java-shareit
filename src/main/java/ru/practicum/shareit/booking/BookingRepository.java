@@ -24,25 +24,25 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query(value = "select b from Booking b where b.id = :bookingId and (b.booker.id = :userId or b.item.ownerId = :userId)")
     Optional<Booking> findByBookingId(@Param("bookingId") long bookingId, @Param("userId") long userId);
 
-    List<Booking> findAllByBookerId(long bookerId);
+    List<Booking> findAllByBookerIdOrderByEndDesc(long bookerId);
 
-    List<Booking> findAllByBookerIdAndEndBefore(long bookerId, LocalDateTime now);
+    List<Booking> findAllByBookerIdAndEndBeforeOrderByEndDesc(long bookerId, LocalDateTime now);
 
-    List<Booking> findAllByBookerIdAndStartAfter(long bookerId, LocalDateTime now);
+    List<Booking> findAllByBookerIdAndStartAfterOrderByEndDesc(long bookerId, LocalDateTime now);
 
-    List<Booking> findAllByBookerIdAndStatus(long bookerId, AccessStatusItem status);
+    List<Booking> findAllByBookerIdAndStatusOrderByEndDesc(long bookerId, AccessStatusItem status);
 
     @Query(value = "select b from Booking b where b.id = :bookerId and (:now between b.start and b.end)")
-    List<Booking> findAllByBookerIdAndNowBetween(@Param("bookerId") long bookerId, @Param("now") LocalDateTime now);
+    List<Booking> findAllByBookerIdAndNowBetweenOrderByEndDesc(@Param("bookerId") long bookerId, @Param("now") LocalDateTime now);
 
-    List<Booking> findAllByItemOwnerId(long ownerId);
+    List<Booking> findAllByItemOwnerIdOrderByEndDesc(long ownerId);
 
-    List<Booking> findAllByItemOwnerIdAndEndBefore(long ownerId, LocalDateTime now);
+    List<Booking> findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(long ownerId, LocalDateTime now);
 
-    List<Booking> findAllByItemOwnerIdAndStartAfter(long ownerId, LocalDateTime now);
+    List<Booking> findAllByItemOwnerIdAndStartAfterOrderByEndDesc(long ownerId, LocalDateTime now);
 
-    List<Booking> findAllByItemOwnerIdAndStatus(long ownerId, AccessStatusItem accessStatusItem);
+    List<Booking> findAllByItemOwnerIdAndStatusOrderByEndDesc(long ownerId, AccessStatusItem accessStatusItem);
 
     @Query(value = "select b from Booking b where b.item.id = :ownerId and (:now between b.start and b.end)")
-    List<Booking> findAllByItemOwnerIdAndNowBetween(@Param("ownerId") long ownerId, @Param("now") LocalDateTime now);
+    List<Booking> findAllByItemOwnerIdAndNowBetweenOrderByEndDesc(@Param("ownerId") long ownerId, @Param("now") LocalDateTime now);
 }

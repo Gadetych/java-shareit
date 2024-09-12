@@ -82,14 +82,14 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> modelList;
         LocalDateTime now = LocalDateTime.now();
         switch (state) {
-            case PAST -> modelList = bookingRepository.findAllByBookerIdAndEndBefore(bookerId, now);
-            case FUTURE -> modelList = bookingRepository.findAllByBookerIdAndStartAfter(bookerId, now);
+            case PAST -> modelList = bookingRepository.findAllByBookerIdAndEndBeforeOrderByEndDesc(bookerId, now);
+            case FUTURE -> modelList = bookingRepository.findAllByBookerIdAndStartAfterOrderByEndDesc(bookerId, now);
             case WAITING ->
-                    modelList = bookingRepository.findAllByBookerIdAndStatus(bookerId, AccessStatusItem.WAITING);
+                    modelList = bookingRepository.findAllByBookerIdAndStatusOrderByEndDesc(bookerId, AccessStatusItem.WAITING);
             case REJECTED ->
-                    modelList = bookingRepository.findAllByBookerIdAndStatus(bookerId, AccessStatusItem.REJECT);
-            case CURRENT -> modelList = bookingRepository.findAllByBookerIdAndNowBetween(bookerId, now);
-            default -> modelList = bookingRepository.findAllByBookerId(bookerId);
+                    modelList = bookingRepository.findAllByBookerIdAndStatusOrderByEndDesc(bookerId, AccessStatusItem.REJECT);
+            case CURRENT -> modelList = bookingRepository.findAllByBookerIdAndNowBetweenOrderByEndDesc(bookerId, now);
+            default -> modelList = bookingRepository.findAllByBookerIdOrderByEndDesc(bookerId);
         }
         return modelList.stream()
                 .map(bookingMapper::modelToDtoResponse)
@@ -102,14 +102,14 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> modelList;
         LocalDateTime now = LocalDateTime.now();
         switch (state) {
-            case PAST -> modelList = bookingRepository.findAllByItemOwnerIdAndEndBefore(ownerId, now);
-            case FUTURE -> modelList = bookingRepository.findAllByItemOwnerIdAndStartAfter(ownerId, now);
+            case PAST -> modelList = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(ownerId, now);
+            case FUTURE -> modelList = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByEndDesc(ownerId, now);
             case WAITING ->
-                    modelList = bookingRepository.findAllByItemOwnerIdAndStatus(ownerId, AccessStatusItem.WAITING);
+                    modelList = bookingRepository.findAllByItemOwnerIdAndStatusOrderByEndDesc(ownerId, AccessStatusItem.WAITING);
             case REJECTED ->
-                    modelList = bookingRepository.findAllByItemOwnerIdAndStatus(ownerId, AccessStatusItem.REJECT);
-            case CURRENT -> modelList = bookingRepository.findAllByItemOwnerIdAndNowBetween(ownerId, now);
-            default -> modelList = bookingRepository.findAllByItemOwnerId(ownerId);
+                    modelList = bookingRepository.findAllByItemOwnerIdAndStatusOrderByEndDesc(ownerId, AccessStatusItem.REJECT);
+            case CURRENT -> modelList = bookingRepository.findAllByItemOwnerIdAndNowBetweenOrderByEndDesc(ownerId, now);
+            default -> modelList = bookingRepository.findAllByItemOwnerIdOrderByEndDesc(ownerId);
         }
         return modelList.stream()
                 .map(bookingMapper::modelToDtoResponse)
