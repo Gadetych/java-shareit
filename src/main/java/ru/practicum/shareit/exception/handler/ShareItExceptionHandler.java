@@ -1,4 +1,4 @@
-package ru.practicum.shareit.exception;
+package ru.practicum.shareit.exception.handler;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -6,6 +6,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.exception.AccessException;
+import ru.practicum.shareit.exception.EmailAlreadyExistException;
+import ru.practicum.shareit.exception.ExceptionDto;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.UnavailableItemException;
 
 @RestControllerAdvice
 public class ShareItExceptionHandler {
@@ -31,6 +36,15 @@ public class ShareItExceptionHandler {
     @ExceptionHandler({EmailAlreadyExistException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ExceptionDto handleServerError(RuntimeException e) {
+        e.printStackTrace();
+        ExceptionDto exceptionDto = new ExceptionDto();
+        exceptionDto.setMessage(e.getMessage());
+        return exceptionDto;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ExceptionDto handleAccess(AccessException e) {
         e.printStackTrace();
         ExceptionDto exceptionDto = new ExceptionDto();
         exceptionDto.setMessage(e.getMessage());

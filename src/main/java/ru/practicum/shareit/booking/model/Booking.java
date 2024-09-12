@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 @ToString
 @Entity
 @Table(name = "bookings")
-public class BookingWithItemAndUser {
+public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
