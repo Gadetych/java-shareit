@@ -24,4 +24,5 @@ public class Item {
     private Long ownerId;
     @Column(name = "available", nullable = false)
     private Boolean available;
+
 }

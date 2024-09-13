@@ -10,7 +10,7 @@ import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.exception.ExceptionDto;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.UnavailableItemException;
+import ru.practicum.shareit.exception.NotValidException;
 
 @RestControllerAdvice
 public class ShareItExceptionHandler {
@@ -24,7 +24,7 @@ public class ShareItExceptionHandler {
         return exceptionDto;
     }
 
-    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class, UnavailableItemException.class})
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class, NotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionDto handleBadRequest(RuntimeException e) {
         e.printStackTrace();

@@ -32,3 +32,14 @@ CREATE TABLE IF NOT EXISTS bookings
     CHECK (status IN ('WAITING', 'APPROVED', 'REJECTED', 'CANCELED'))
 );
 
+CREATE TABLE IF NOT EXISTS comments
+(
+    id        BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
+    item_id   BIGINT                              NOT NULL,
+    author_id BIGINT                              NOT NULL,
+    text      VARCHAR(512),
+    created   TIMESTAMP                           Not Null,
+    CONSTRAINT pk_comment PRIMARY KEY (id),
+    CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES items,
+    CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users
+);

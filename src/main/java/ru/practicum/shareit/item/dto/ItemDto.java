@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.Data;
 import ru.practicum.shareit.Marker;
+import ru.practicum.shareit.booking.dto.BookingDto;
 
 @Data
 public class ItemDto {
@@ -17,4 +18,6 @@ public class ItemDto {
     private Long ownerId;
     @NotNull(groups = Marker.Create.class)
     private Boolean available;
+    private BookingDto lastBooking;
+    private BookingDto nextBooking;
 }
