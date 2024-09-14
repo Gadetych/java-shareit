@@ -18,13 +18,11 @@ import ru.practicum.shareit.Marker;
 import ru.practicum.shareit.item.dto.CommentDtoCreate;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;
 import ru.practicum.shareit.request.ItemRequestController;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
@@ -59,16 +57,6 @@ public class ItemController {
         return itemService.update(ownerId, dto);
     }
 
-    @GetMapping("/{itemId}")
-    public ItemDto get(@RequestHeader(requestHeader)
-                       @NotNull
-                       @Positive Long ownerId,
-                       @PathVariable
-                       @NotNull
-                       @Positive Long itemId) {
-        return itemService.get(ownerId, itemId);
-    }
-
     @GetMapping
     List<ItemDto> getAll(@RequestHeader(requestHeader)
                          @NotNull
@@ -91,5 +79,15 @@ public class ItemController {
                                             @RequestBody
                                             @Valid CommentDtoCreate dto) {
         return itemService.createComment(dto, authorId, itemId);
+    }
+
+    @GetMapping("/{itemId}")
+    public ItemWithCommentsDtoResponse getItemWithComments(@RequestHeader(requestHeader)
+                                                           @Positive
+                                                           long userId,
+                                                           @PathVariable
+                                                           @Positive
+                                                           long itemId) {
+        return itemService.getItemWithComments(itemId);
     }
 }

@@ -12,6 +12,7 @@ import ru.practicum.shareit.exception.NotValidException;
 import ru.practicum.shareit.item.dto.CommentDtoCreate;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
@@ -20,7 +21,9 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +44,11 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public boolean exists(Long itemId) {
-        return itemRepository.existsById(itemId);
+        boolean exists = itemRepository.existsById(itemId);
+        if (!exists) {
+            throw new NotFoundException("Item not found with id " + itemId);
+        }
+        return true;
     }
 
     @Override
@@ -58,9 +65,7 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Updating. Item id = " + dto.getId() + " not found for user id = " + ownerId);
         }
         userService.exists(ownerId);
-        if (!exists(dto.getId())) {
-            throw new NotFoundException("Updating. Item not found with id " + dto.getId());
-        }
+        exists(dto.getId());
         Item item = itemRepository.findById(dto.getId()).get();
         if (dto.getName() != null) {
             item.setName(dto.getName());
@@ -74,16 +79,11 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.modelToDto(itemRepository.save(item));
     }
 
-    @Override
-    public ItemDto get(Long ownerId, Long id) {
-        userService.exists(ownerId);
-        if (!exists(id)) {
-            throw new NotFoundException("Getting. Item not found with id " + id);
-        }
-        Item model = itemRepository.findById(id).get();
+    public Map<String, BookingDto> getLastAndNextBookings(Long ownerId) {
+        Map<String, BookingDto> bookingDtoMap = new HashMap<>();
         LocalDateTime now = LocalDateTime.now();
-        Booking lastBookingModel = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByEndDesc(ownerId, now).stream().findFirst().orElse(null);
         List<Booking> list = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByEndDesc(ownerId, now);
+        Booking lastBookingModel = list.stream().findFirst().orElse(null);
         Booking nextBookingModel = null;
         long min = Long.MAX_VALUE;
         for (Booking booking : list) {
@@ -101,9 +101,20 @@ public class ItemServiceImpl implements ItemService {
         if (lastBookingModel != null) {
             lastBooking = bookingMapper.modelToDtoResponse(lastBookingModel);
         }
+        bookingDtoMap.put("lastBooking", lastBooking);
+        bookingDtoMap.put("nextBooking", nextBooking);
+        return bookingDtoMap;
+    }
+
+    @Override
+    public ItemDto get(Long ownerId, Long id) {
+        userService.exists(ownerId);
+        exists(id);
+        Item model = itemRepository.findById(id).get();
+        Map<String, BookingDto> bookingDtoMap = getLastAndNextBookings(ownerId);
         ItemDto result = itemMapper.modelToDto(model);
-        result.setLastBooking(lastBooking);
-        result.setNextBooking(nextBooking);
+        result.setLastBooking(bookingDtoMap.get("lastBooking"));
+        result.setNextBooking(bookingDtoMap.get("nextBooking"));
         return result;
     }
 
@@ -129,7 +140,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDtoResponse createComment(CommentDtoCreate dto, long authorId, long itemId) {
-        Booking booking = bookingRepository.findByBookerIdAndItemIdOrderByStart(authorId, itemId).stream()
+        bookingRepository.findByBookerIdAndItemIdOrderByStart(authorId, itemId).stream()
                 .filter((b) -> b.getStart().isBefore(dto.getCreated()))
                 .findFirst().orElseThrow(() -> new NotValidException("Creating comment failed"));
         Comment model = commentMapper.dtoToModel(dto);
@@ -138,5 +149,16 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId).orElse(null);
         model.setItem(item);
         return commentMapper.modelToDto(commentRepository.save(model));
+    }
+
+    @Override
+    public ItemWithCommentsDtoResponse getItemWithComments(long itemId) {
+        exists(itemId);
+        Item model = itemRepository.findById(itemId).get();
+        List<CommentDtoResponse> comments = commentRepository.findAllByItemIdOrderById(itemId).stream()
+                .map(commentMapper::modelToDto)
+                .toList();
+        Map<String, BookingDto> bookingDtoMap = getLastAndNextBookings(model.getOwnerId());
+        return itemMapper.modelToDtoWithComments(model, comments, bookingDtoMap);
     }
 }
