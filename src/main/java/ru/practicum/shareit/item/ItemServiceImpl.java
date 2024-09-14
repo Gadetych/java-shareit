@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -28,6 +29,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     //    изначально хотел сделать зависимоть BookingService, но тогда возникает проблема циклических зависимостей
@@ -52,6 +54,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto save(Long ownerId, ItemDto dto) {
         userService.exists(ownerId);
         dto.setOwnerId(ownerId);
@@ -60,6 +63,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto update(Long ownerId, ItemDto dto) {
         if (!itemRepository.existsItemForUser(ownerId, dto.getId())) {
             throw new NotFoundException("Updating. Item id = " + dto.getId() + " not found for user id = " + ownerId);

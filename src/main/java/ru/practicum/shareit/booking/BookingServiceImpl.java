@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.AccessStatusItem;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoCreate;
@@ -13,7 +14,6 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.UnavailableItemException;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -23,12 +23,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemService itemService;
     private final UserService userService;
     private final BookingMapper bookingMapper;
-    private final UserRepository userRepository;
 
     @Override
     public void exists(long bookingId) {
@@ -45,6 +45,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto save(BookingDtoCreate dtoCreate) {
         ItemDto itemDto = itemService.get(dtoCreate.getBookerId(), dtoCreate.getItemId());
         if (!itemDto.getAvailable()) {
@@ -56,6 +57,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto updateStatusBooking(long bookingId, long ownerId, boolean approved) {
         exists(bookingId, ownerId);
         userService.exists(ownerId);
