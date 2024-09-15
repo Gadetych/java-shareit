@@ -146,7 +146,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public CommentDtoResponse createComment(CommentDtoCreate dto, long authorId, long itemId) {
         bookingRepository.findByBookerIdAndItemIdOrderByStart(authorId, itemId).stream()
-                .filter((b) -> b.getStart().isBefore(dto.getCreated()))
+                .filter((b) -> b.getEnd().isBefore(dto.getCreated()))
                 .findFirst().orElseThrow(() -> new NotValidException("Creating comment failed"));
         Comment model = commentMapper.dtoToModel(dto);
         User author = userMapper.dtoToModel(userService.get(authorId));
