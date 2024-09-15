@@ -143,6 +143,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDtoResponse createComment(CommentDtoCreate dto, long authorId, long itemId) {
         bookingRepository.findByBookerIdAndItemIdOrderByStart(authorId, itemId).stream()
                 .filter((b) -> b.getStart().isBefore(dto.getCreated()))

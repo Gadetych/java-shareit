@@ -40,6 +40,6 @@ CREATE TABLE IF NOT EXISTS comments
     text      VARCHAR(512),
     created   TIMESTAMP                           Not Null,
     CONSTRAINT pk_comment PRIMARY KEY (id),
-    CONSTRAINT fk_item FOREIGN KEY (item_id) REFERENCES items,
+    CONSTRAINT fk_item_com FOREIGN KEY (item_id) REFERENCES items,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users
 );
