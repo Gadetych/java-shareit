@@ -16,7 +16,6 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
 
     @Override
     public void exists(Long id) {
@@ -36,8 +35,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto save(UserDto userDto) {
         exists(userDto.getEmail());
-        User user = userMapper.dtoToModel(userDto);
-        return userMapper.modelToDto(userRepository.save(user));
+        User user = UserMapper.dtoToModel(userDto);
+        return UserMapper.modelToDto(userRepository.save(user));
     }
 
     @Override
@@ -45,29 +44,29 @@ public class UserServiceImpl implements UserService {
     public UserDto update(UserDto userDto) {
         exists(userDto.getId());
         exists(userDto.getEmail());
-        if (userDto.getName() != null && userDto.getEmail() == null) {
-            userRepository.updateUserName(userDto.getId(), userDto.getName());
-        }
-        if (userDto.getEmail() != null && userDto.getName() == null) {
+        if (userDto.getName() != null) {
+            if (userDto.getEmail() != null) {
+                userRepository.updateUserNameAndEmail(userDto.getId(), userDto.getName(), userDto.getEmail());
+            } else {
+                userRepository.updateUserName(userDto.getId(), userDto.getName());
+            }
+        } else if (userDto.getEmail() != null) {
             userRepository.updateUserEmail(userDto.getId(), userDto.getEmail());
         }
-        if (userDto.getName() != null && userDto.getEmail() != null) {
-            userRepository.updateUserNameAndEmail(userDto.getId(), userDto.getName(), userDto.getEmail());
-        }
-        return userMapper.modelToDto(userRepository.findById(userDto.getId()).get());
+        return UserMapper.modelToDto(userRepository.findById(userDto.getId()).get());
     }
 
     @Override
     public UserDto get(Long id) {
         exists(id);
-        return userMapper.modelToDto(userRepository.findById(id).get());
+        return UserMapper.modelToDto(userRepository.findById(id).get());
     }
 
     @Override
     public List<UserDto> getAll() {
         Sort sortById = Sort.by(Sort.Direction.ASC, "id");
         return userRepository.findAll(sortById).stream()
-                .map(userMapper::modelToDto)
+                .map(UserMapper::modelToDto)
                 .toList();
     }
 

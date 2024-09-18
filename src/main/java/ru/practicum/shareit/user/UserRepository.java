@@ -13,7 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUserEmail(String email);
 
     @Modifying
-    @Transactional
     @Query("UPDATE User u SET u.name = :name WHERE u.id = :id")
     void updateUserName(@Param("id") Long id, @Param("name") String name);
 

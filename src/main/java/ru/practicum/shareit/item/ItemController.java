@@ -19,7 +19,6 @@ import ru.practicum.shareit.item.dto.CommentDtoCreate;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;
-import ru.practicum.shareit.request.ItemRequestController;
 
 import java.util.List;
 
@@ -29,7 +28,6 @@ import java.util.List;
 @Validated
 public class ItemController {
     private final ItemService itemService;
-    private final ItemRequestController itemRequestController;
     private final String requestHeader = "X-Sharer-User-Id";
 
     @PostMapping

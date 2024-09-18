@@ -32,17 +32,9 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
-    //    изначально хотел сделать зависимоть BookingService, но тогда возникает проблема циклических зависимостей
-//    решил проблему через зависимости репозитория и маппера, но мне думается, что это не совсем корректное решение.
-//    подскажи как сделать лучше
     private final BookingRepository bookingRepository;
-    private final BookingMapper bookingMapper;
-
     private final CommentRepository commentRepository;
-    private final CommentMapper commentMapper;
     private final UserService userService;
-    private final UserMapper userMapper;
-    private final ItemMapper itemMapper;
 
     @Override
     public boolean exists(Long itemId) {
@@ -58,8 +50,8 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto save(Long ownerId, ItemDto dto) {
         userService.exists(ownerId);
         dto.setOwnerId(ownerId);
-        Item item = itemMapper.dtoToModel(dto);
-        return itemMapper.modelToDto(itemRepository.save(item));
+        Item item = ItemMapper.dtoToModel(dto);
+        return ItemMapper.modelToDto(itemRepository.save(item));
     }
 
     @Override
@@ -80,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
         if (dto.getAvailable() != null) {
             item.setAvailable(dto.getAvailable());
         }
-        return itemMapper.modelToDto(itemRepository.save(item));
+        return ItemMapper.modelToDto(itemRepository.save(item));
     }
 
     public Map<String, BookingDto> getLastAndNextBookings(Long ownerId) {
@@ -99,11 +91,11 @@ public class ItemServiceImpl implements ItemService {
         }
         BookingDto nextBooking = null;
         if (nextBookingModel != null) {
-            nextBooking = bookingMapper.modelToDtoResponse(nextBookingModel);
+            nextBooking = BookingMapper.modelToDtoResponse(nextBookingModel);
         }
         BookingDto lastBooking = null;
         if (lastBookingModel != null) {
-            lastBooking = bookingMapper.modelToDtoResponse(lastBookingModel);
+            lastBooking = BookingMapper.modelToDtoResponse(lastBookingModel);
         }
         bookingDtoMap.put("lastBooking", lastBooking);
         bookingDtoMap.put("nextBooking", nextBooking);
@@ -116,7 +108,7 @@ public class ItemServiceImpl implements ItemService {
         exists(id);
         Item model = itemRepository.findById(id).get();
         Map<String, BookingDto> bookingDtoMap = getLastAndNextBookings(ownerId);
-        ItemDto result = itemMapper.modelToDto(model);
+        ItemDto result = ItemMapper.modelToDto(model);
         result.setLastBooking(bookingDtoMap.get("lastBooking"));
         result.setNextBooking(bookingDtoMap.get("nextBooking"));
         return result;
@@ -126,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> findAllItemsByOwnerId(Long ownerId) {
         userService.exists(ownerId);
         return itemRepository.findAllItemsByOwnerId(ownerId).stream()
-                .map(itemMapper::modelToDto)
+                .map(ItemMapper::modelToDto)
                 .toList();
     }
 
@@ -138,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
         }
         List<Item> result = itemRepository.findContaining(text);
         return result.stream()
-                .map(itemMapper::modelToDto)
+                .map(ItemMapper::modelToDto)
                 .toList();
     }
 
@@ -148,12 +140,12 @@ public class ItemServiceImpl implements ItemService {
         bookingRepository.findByBookerIdAndItemIdOrderByStart(authorId, itemId).stream()
                 .filter((b) -> b.getEnd().isBefore(dto.getCreated()))
                 .findFirst().orElseThrow(() -> new NotValidException("Creating comment failed"));
-        Comment model = commentMapper.dtoToModel(dto);
-        User author = userMapper.dtoToModel(userService.get(authorId));
+        Comment model = CommentMapper.dtoToModel(dto);
+        User author = UserMapper.dtoToModel(userService.get(authorId));
         model.setAuthor(author);
         Item item = itemRepository.findById(itemId).orElse(null);
         model.setItem(item);
-        return commentMapper.modelToDto(commentRepository.save(model));
+        return CommentMapper.modelToDto(commentRepository.save(model));
     }
 
     @Override
@@ -161,9 +153,9 @@ public class ItemServiceImpl implements ItemService {
         exists(itemId);
         Item model = itemRepository.findById(itemId).get();
         List<CommentDtoResponse> comments = commentRepository.findAllByItemIdOrderById(itemId).stream()
-                .map(commentMapper::modelToDto)
+                .map(CommentMapper::modelToDto)
                 .toList();
         Map<String, BookingDto> bookingDtoMap = getLastAndNextBookings(model.getOwnerId());
-        return itemMapper.modelToDtoWithComments(model, comments, bookingDtoMap);
+        return ItemMapper.modelToDtoWithComments(model, comments, bookingDtoMap);
     }
 }

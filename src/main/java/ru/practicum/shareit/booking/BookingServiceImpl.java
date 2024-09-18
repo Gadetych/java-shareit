@@ -28,7 +28,6 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemService itemService;
     private final UserService userService;
-    private final BookingMapper bookingMapper;
 
     @Override
     public void exists(long bookingId) {
@@ -52,8 +51,8 @@ public class BookingServiceImpl implements BookingService {
             throw new UnavailableItemException("Saving. Item is not available, id = " + itemDto.getId());
         }
         UserDto bookerDto = userService.get(dtoCreate.getBookerId());
-        Booking booking = bookingMapper.dtoToModel(dtoCreate, itemDto, bookerDto);
-        return bookingMapper.modelToDtoResponse(bookingRepository.save(booking));
+        Booking booking = BookingMapper.dtoToModel(dtoCreate, itemDto, bookerDto);
+        return BookingMapper.modelToDtoResponse(bookingRepository.save(booking));
     }
 
     @Override
@@ -68,14 +67,14 @@ public class BookingServiceImpl implements BookingService {
             newStatus = AccessStatusItem.REJECT;
         }
         bookingRepository.updateBooking(bookingId, ownerId, newStatus);
-        return bookingMapper.modelToDtoResponse(bookingRepository.findById(bookingId).get());
+        return BookingMapper.modelToDtoResponse(bookingRepository.findById(bookingId).get());
     }
 
     @Override
     public BookingDto get(long bookingId, long userId) {
         exists(bookingId);
         Booking result = bookingRepository.findByBookingId(bookingId, userId).orElseThrow(() -> new BookingAccessException("Denied access for user id = " + userId));
-        return bookingMapper.modelToDtoResponse(result);
+        return BookingMapper.modelToDtoResponse(result);
     }
 
     @Override
@@ -94,7 +93,7 @@ public class BookingServiceImpl implements BookingService {
             default -> modelList = bookingRepository.findAllByBookerIdOrderByEndDesc(bookerId);
         }
         return modelList.stream()
-                .map(bookingMapper::modelToDtoResponse)
+                .map(BookingMapper::modelToDtoResponse)
                 .toList();
     }
 
@@ -114,7 +113,7 @@ public class BookingServiceImpl implements BookingService {
             default -> modelList = bookingRepository.findAllByItemOwnerIdOrderByEndDesc(ownerId);
         }
         return modelList.stream()
-                .map(bookingMapper::modelToDtoResponse)
+                .map(BookingMapper::modelToDtoResponse)
                 .toList();
     }
 
