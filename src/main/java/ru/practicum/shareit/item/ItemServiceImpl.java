@@ -22,6 +22,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,11 +76,17 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.modelToDto(itemRepository.save(item));
     }
 
-    public Map<String, BookingDto> getLastAndNextBookings(Long ownerId) {
+    public Map<String, BookingDto> getLastAndNextBookings(List<Booking> list, LocalDateTime now) {
         Map<String, BookingDto> bookingDtoMap = new HashMap<>();
-        LocalDateTime now = LocalDateTime.now();
-        List<Booking> list = bookingRepository.findAllByItemOwnerIdAndStartAfterOrderByEndDesc(ownerId, now);
-        Booking lastBookingModel = list.stream().findFirst().orElse(null);
+        Booking lastBookingModel = null;
+        LocalDateTime last = LocalDateTime.MIN;
+        for (Booking booking : list) {
+            if (booking.getEnd().isAfter(last)) {
+                last = booking.getEnd();
+                lastBookingModel = booking;
+            }
+        }
+
         Booking nextBookingModel = null;
         long min = Long.MAX_VALUE;
         for (Booking booking : list) {
@@ -107,7 +114,9 @@ public class ItemServiceImpl implements ItemService {
         userService.exists(ownerId);
         exists(id);
         Item model = itemRepository.findById(id).get();
-        Map<String, BookingDto> bookingDtoMap = getLastAndNextBookings(ownerId);
+        LocalDateTime now = LocalDateTime.now();
+        List<Booking> list = bookingRepository.findAllByItemIdAndEndBeforeOrderByEndDesc(model.getId(), now);
+        Map<String, BookingDto> bookingDtoMap = getLastAndNextBookings(list, now);
         ItemDto result = ItemMapper.modelToDto(model);
         result.setLastBooking(bookingDtoMap.get("lastBooking"));
         result.setNextBooking(bookingDtoMap.get("nextBooking"));
@@ -115,11 +124,47 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> findAllItemsByOwnerId(Long ownerId) {
+    public List<ItemWithCommentsDtoResponse> findAllItemsByOwnerId(Long ownerId) {
         userService.exists(ownerId);
-        return itemRepository.findAllItemsByOwnerId(ownerId).stream()
-                .map(ItemMapper::modelToDto)
-                .toList();
+        LocalDateTime now = LocalDateTime.now();
+        List<Item> items = itemRepository.findAllItemsByOwnerId(ownerId);
+        List<Booking> bookings = bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(ownerId, now);
+        Map<Item, List<Booking>> bookingsByItemId = new HashMap<>();
+        for (Booking booking : bookings) {
+            Item item = booking.getItem();
+            if (!bookingsByItemId.containsKey(item)) {
+                List<Booking> newBookings = new ArrayList<>();
+                newBookings.add(booking);
+                bookingsByItemId.put(item, newBookings);
+            }
+            bookingsByItemId.get(item).add(booking);
+        }
+        Map<Item, Map<String, BookingDto>> itemsByLastAndNextBookingDto = new HashMap<>();
+        for (Map.Entry<Item, List<Booking>> entry : bookingsByItemId.entrySet()) {
+            Item item = entry.getKey();
+            Map<String, BookingDto> lastAndNextBooking = getLastAndNextBookings(entry.getValue(), now);
+            itemsByLastAndNextBookingDto.put(item, lastAndNextBooking);
+        }
+
+        List<Comment> comments = commentRepository.findAllByItemOwnerId(ownerId);
+        Map<Item, List<CommentDtoResponse>> commentsByItemId = new HashMap<>();
+        for (Comment comment : comments) {
+            Item item = comment.getItem();
+            CommentDtoResponse commentDtoResponse = CommentMapper.modelToDto(comment);
+            List<CommentDtoResponse> list = commentsByItemId.get(item);
+            if (list == null) {
+                list = new ArrayList<>();
+                list.add(commentDtoResponse);
+                commentsByItemId.put(item, list);
+            }
+            list.add(commentDtoResponse);
+        }
+        List<ItemWithCommentsDtoResponse> result = new ArrayList<>();
+        for (Item item : items) {
+            ItemWithCommentsDtoResponse itemWithCommentsDtoResponse = ItemMapper.modelToDtoWithComments(item, commentsByItemId.get(item), itemsByLastAndNextBookingDto.get(item));
+            result.add(itemWithCommentsDtoResponse);
+        }
+        return result;
     }
 
     @Override
@@ -149,13 +194,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemWithCommentsDtoResponse getItemWithComments(long itemId) {
+    public ItemWithCommentsDtoResponse getItemWithComments(long itemId, long userId) {
+        LocalDateTime now = LocalDateTime.now();
         exists(itemId);
         Item model = itemRepository.findById(itemId).get();
         List<CommentDtoResponse> comments = commentRepository.findAllByItemIdOrderById(itemId).stream()
                 .map(CommentMapper::modelToDto)
                 .toList();
-        Map<String, BookingDto> bookingDtoMap = getLastAndNextBookings(model.getOwnerId());
+        Map<String, BookingDto> bookingDtoMap = null;
+        if (model.getOwnerId().equals(userId)) {
+            List<Booking> list = bookingRepository.findAllByItemIdAndEndBeforeOrderByEndDesc(itemId, now);
+            bookingDtoMap = getLastAndNextBookings(list, now);
+        }
         return ItemMapper.modelToDtoWithComments(model, comments, bookingDtoMap);
     }
 }

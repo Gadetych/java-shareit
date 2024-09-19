@@ -16,11 +16,11 @@ public interface ItemService {
 
     ItemDto get(Long ownerId, Long id);
 
-    List<ItemDto> findAllItemsByOwnerId(Long ownerId);
+    List<ItemWithCommentsDtoResponse> findAllItemsByOwnerId(Long ownerId);
 
     List<ItemDto> search(Long ownerId, String text);
 
     CommentDtoResponse createComment(CommentDtoCreate dto, long authorId, long itemId);
 
-    ItemWithCommentsDtoResponse getItemWithComments(long itemId);
+    ItemWithCommentsDtoResponse getItemWithComments(long itemId, long userId);
 }

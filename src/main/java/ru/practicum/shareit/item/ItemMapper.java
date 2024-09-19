@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,14 @@ public class ItemMapper {
     }
 
     public static ItemWithCommentsDtoResponse modelToDtoWithComments(Item model, List<CommentDtoResponse> comments, Map<String, BookingDto> bookingDtoMap) {
+        if (bookingDtoMap == null) {
+            bookingDtoMap = new HashMap<>();
+            bookingDtoMap.put("lastBooking", null);
+            bookingDtoMap.put("nextBooking", null);
+        }
+        if (comments == null) {
+            comments = List.of();
+        }
         return ItemWithCommentsDtoResponse.builder()
                 .id(model.getId())
                 .name(model.getName())

@@ -56,7 +56,7 @@ public class ItemController {
     }
 
     @GetMapping
-    List<ItemDto> getAll(@RequestHeader(requestHeader)
+    List<ItemWithCommentsDtoResponse> getAll(@RequestHeader(requestHeader)
                          @NotNull
                          @Positive Long ownerId) {
         return itemService.findAllItemsByOwnerId(ownerId);
@@ -86,6 +86,6 @@ public class ItemController {
                                                            @PathVariable
                                                            @Positive
                                                            long itemId) {
-        return itemService.getItemWithComments(itemId);
+        return itemService.getItemWithComments(itemId, userId);
     }
 }
