@@ -1,20 +1,22 @@
 package ru.practicum.shareit.booking.dto;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
 @Data
-public class BookingDto {
-    private Long id;
+public class BookingDtoCreate {
+    @Positive
+    private long itemId;
+    @NotNull
     private LocalDateTime start;
+    @NotNull
     private LocalDateTime end;
-    private ItemDto item;
-    private UserDto booker;
-    private AccessStatusItem status;
+    private long bookerId;
+    private AccessStatusItem status = AccessStatusItem.WAITING;
 
     @AssertTrue
     public boolean isValidDate() {

@@ -15,21 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.Marker;
+import ru.practicum.shareit.item.dto.CommentDtoCreate;
+import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.request.ItemRequestController;
+import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/items")
 @Validated
 public class ItemController {
     private final ItemService itemService;
-    private final ItemRequestController itemRequestController;
     private final String requestHeader = "X-Sharer-User-Id";
 
     @PostMapping
@@ -57,21 +55,11 @@ public class ItemController {
         return itemService.update(ownerId, dto);
     }
 
-    @GetMapping("/{itemId}")
-    public ItemDto get(@RequestHeader(requestHeader)
-                       @NotNull
-                       @Positive Long ownerId,
-                       @PathVariable
-                       @NotNull
-                       @Positive Long itemId) {
-        return itemService.get(ownerId, itemId);
-    }
-
     @GetMapping
-    List<ItemDto> getAll(@RequestHeader(requestHeader)
+    List<ItemWithCommentsDtoResponse> getAll(@RequestHeader(requestHeader)
                          @NotNull
                          @Positive Long ownerId) {
-        return itemService.getAll(ownerId);
+        return itemService.findAllItemsByOwnerId(ownerId);
     }
 
     @GetMapping("/search")
@@ -80,5 +68,24 @@ public class ItemController {
                          @Positive Long ownerId,
                          @RequestParam("text") String text) {
         return itemService.search(ownerId, text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDtoResponse createComment(@RequestHeader(requestHeader)
+                                            @Positive long authorId,
+                                            @PathVariable long itemId,
+                                            @RequestBody
+                                            @Valid CommentDtoCreate dto) {
+        return itemService.createComment(dto, authorId, itemId);
+    }
+
+    @GetMapping("/{itemId}")
+    public ItemWithCommentsDtoResponse getItemWithComments(@RequestHeader(requestHeader)
+                                                           @Positive
+                                                           long userId,
+                                                           @PathVariable
+                                                           @Positive
+                                                           long itemId) {
+        return itemService.getItemWithComments(itemId, userId);
     }
 }
