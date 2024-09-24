@@ -14,8 +14,10 @@ CREATE TABLE IF NOT EXISTS items
     description VARCHAR(512)                        NOT NULL,
     owner_id    BIGINT                              NOT NULL,
     available   BOOLEAN                             NOT NULL,
+    request_id BIGINT,
     CONSTRAINT pk_item PRIMARY KEY (id),
-    CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES users
+    CONSTRAINT fk_owner_id FOREIGN KEY (owner_id) REFERENCES users,
+    CONSTRAINT fk_request FOREIGN KEY (request_id) REFERENCES requests
 );
 
 CREATE TABLE IF NOT EXISTS bookings
@@ -42,4 +44,14 @@ CREATE TABLE IF NOT EXISTS comments
     CONSTRAINT pk_comment PRIMARY KEY (id),
     CONSTRAINT fk_item_com FOREIGN KEY (item_id) REFERENCES items,
     CONSTRAINT fk_author FOREIGN KEY (author_id) REFERENCES users
+);
+
+CREATE TABLE IF NOT EXISTS requests
+(
+    id           BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
+    description  VARCHAR(512),
+    requestor_id BIGINT                              NOT NULL,
+    created      TIMESTAMP                           NOT NULL,
+    CONSTRAINT pk_request PRIMARY KEY (id),
+    CONSTRAINT fk_user FOREIGN KEY (requestor_id) REFERENCES users
 );
