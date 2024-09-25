@@ -4,8 +4,10 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemFeedbackDto;
 import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.ItemFeedback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +56,14 @@ public class ItemMapper {
                 .lastBooking(bookingDtoMap.get("lastBooking"))
                 .nextBooking(bookingDtoMap.get("nextBooking"))
                 .requestId(model.getRequestId())
+                .build();
+    }
+
+    public ItemFeedbackDto modelFeedbackToDtoFeedback(ItemFeedback model) {
+        return ItemFeedbackDto.builder()
+                .id(model.getId())
+                .name(model.getName())
+                .ownerId(model.getOwnerId())
                 .build();
     }
 }

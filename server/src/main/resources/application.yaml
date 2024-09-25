@@ -18,6 +18,8 @@ spring:
 
 logging:
   level:
+    ru:
+      practicum: DEBUG
     org:
       springframework:
         orm:
