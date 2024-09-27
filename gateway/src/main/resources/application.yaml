@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+logging:
+  level:
+    httpclient:
+      wire: DEBUG
+    org:
+      apache:
+        http: DEBUG
+      springframework:
+        web:
+          client:
+            RestTemplate: DEBUG
+
+shareit-server:
+  url: "http://localhost:9090"
