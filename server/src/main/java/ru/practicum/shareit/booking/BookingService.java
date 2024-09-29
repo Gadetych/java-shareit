@@ -12,13 +12,13 @@ public interface BookingService {
 
     void exists(long bookingId, long userId);
 
-    BookingDto save(BookingDtoCreate dtoCreate);
+    BookingDto create(BookingDtoCreate dtoCreate);
 
     BookingDto updateStatusBooking(long bookingId, long userId, boolean approved);
 
-    BookingDto get(long bookingId, long userId);
+    BookingDto findById(long bookingId, long userId);
 
-    List<BookingDto> getAllByBooker(long bookerId, BookingState state);
+    List<BookingDto> findAllByBooker(long bookerId, BookingState state);
 
-    List<BookingDto> getAllByOwner(long ownerId, BookingState state);
+    List<BookingDto> findAllByOwner(long ownerId, BookingState state);
 }

@@ -2,7 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.dto.CommentDtoResponse;
+import ru.practicum.shareit.item.comment.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemFeedbackDto;
 import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;

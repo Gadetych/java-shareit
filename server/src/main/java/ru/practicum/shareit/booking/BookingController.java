@@ -1,10 +1,8 @@
 package ru.practicum.shareit.booking;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,60 +22,46 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/bookings")
 @RequiredArgsConstructor
-@Validated
+@Slf4j
 public class BookingController {
     private final BookingService bookingService;
     private final String requestHeader = "X-Sharer-User-Id";
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingDto creat(@Valid
-                            @RequestBody
-                            BookingDtoCreate dtoCreate,
-                            @RequestHeader(value = requestHeader)
-                            @Positive
-                            long bookerId) {
+    public BookingDto creat(@RequestBody BookingDtoCreate dtoCreate,
+                            @RequestHeader(value = requestHeader) long bookerId) {
         dtoCreate.setBookerId(bookerId);
-        return bookingService.save(dtoCreate);
+        log.info("Creating new booking: {}", dtoCreate);
+        return bookingService.create(dtoCreate);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto updateStatusBooking(@PathVariable
-                                          @Positive
-                                          long bookingId,
-                                          @RequestHeader(value = requestHeader)
-                                          @Positive
-                                          long userId,
-                                          @RequestParam
-                                          boolean approved) {
+    public BookingDto updateStatusBooking(@PathVariable long bookingId,
+                                          @RequestHeader(value = requestHeader) long userId,
+                                          @RequestParam boolean approved) {
+        log.info("Updating status booking: {}, userId: {}, approved: {}", bookingId, userId, approved);
         return bookingService.updateStatusBooking(bookingId, userId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getBooking(@PathVariable
-                                 @Positive
-                                 long bookingId,
-                                 @RequestHeader(value = requestHeader)
-                                 @Positive
-                                 long userId) {
-        return bookingService.get(bookingId, userId);
+    public BookingDto findById(@PathVariable long bookingId,
+                               @RequestHeader(value = requestHeader) long userId) {
+        log.info("Getting booking: {}, userId: {}", bookingId, userId);
+        return bookingService.findById(bookingId, userId);
     }
 
     @GetMapping
-    public List<BookingDto> getAllByBooker(@RequestHeader(value = requestHeader)
-                                           @Positive
-                                           long bookerId,
-                                           @RequestParam(defaultValue = "ALL")
-                                           BookingState state) {
-        return bookingService.getAllByBooker(bookerId, state);
+    public List<BookingDto> findAllByBooker(@RequestHeader(value = requestHeader) long bookerId,
+                                            @RequestParam(defaultValue = "ALL") BookingState stateParam) {
+        log.info("Getting bookings by bookerId: {}, state: {}", bookerId, stateParam);
+        return bookingService.findAllByBooker(bookerId, stateParam);
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getAllByOwner(@RequestHeader(value = requestHeader)
-                                          @Positive
-                                          long ownerId,
-                                          @RequestParam(defaultValue = "ALL")
-                                          BookingState state) {
-        return bookingService.getAllByOwner(ownerId, state);
+    public List<BookingDto> findAllByOwner(@RequestHeader(value = requestHeader) long ownerId,
+                                           @RequestParam(defaultValue = "ALL") BookingState state) {
+        log.info("Getting bookings by ownerId: {}, state: {}", ownerId, state);
+        return bookingService.findAllByOwner(ownerId, state);
     }
 }

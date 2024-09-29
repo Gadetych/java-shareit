@@ -1,8 +1,9 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.comment;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.shareit.item.dto.CommentDtoCreate;
-import ru.practicum.shareit.item.dto.CommentDtoResponse;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.comment.dto.CommentDtoCreate;
+import ru.practicum.shareit.item.comment.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.user.UserMapper;
 

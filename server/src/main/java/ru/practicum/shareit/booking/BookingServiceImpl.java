@@ -45,7 +45,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto save(BookingDtoCreate dtoCreate) {
+    public BookingDto create(BookingDtoCreate dtoCreate) {
         ItemDto itemDto = itemService.get(dtoCreate.getBookerId(), dtoCreate.getItemId());
         if (!itemDto.getAvailable()) {
             throw new UnavailableItemException("Saving. Item is not available, id = " + itemDto.getId());
@@ -71,14 +71,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto get(long bookingId, long userId) {
+    public BookingDto findById(long bookingId, long userId) {
         exists(bookingId);
         Booking result = bookingRepository.findByBookingId(bookingId, userId).orElseThrow(() -> new BookingAccessException("Denied access for user id = " + userId));
         return BookingMapper.modelToDtoResponse(result);
     }
 
     @Override
-    public List<BookingDto> getAllByBooker(long bookerId, BookingState state) {
+    public List<BookingDto> findAllByBooker(long bookerId, BookingState state) {
         userService.exists(bookerId);
         List<Booking> modelList;
         LocalDateTime now = LocalDateTime.now();
@@ -98,7 +98,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllByOwner(long ownerId, BookingState state) {
+    public List<BookingDto> findAllByOwner(long ownerId, BookingState state) {
         userService.exists(ownerId);
         List<Booking> modelList;
         LocalDateTime now = LocalDateTime.now();
