@@ -53,13 +53,13 @@ public class UserServiceImpl implements UserService {
         } else if (userDto.getEmail() != null) {
             userRepository.updateUserEmail(userDto.getId(), userDto.getEmail());
         }
-        return UserMapper.modelToDto(userRepository.findById(userDto.getId()).get());
+        return UserMapper.modelToDto(userRepository.findById(userDto.getId()).orElseThrow(() -> new NotFoundException("User not found with id: " + userDto.getId())));
     }
 
     @Override
     public UserDto get(Long id) {
         exists(id);
-        return UserMapper.modelToDto(userRepository.findById(id).get());
+        return UserMapper.modelToDto(userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found with id: " + id)));
     }
 
     @Override

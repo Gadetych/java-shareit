@@ -22,9 +22,19 @@
 
     <properties>
 		<java.version>21</java.version>
+        <hamcrest.version>2.2</hamcrest.version>
 	</properties>
 
-	<build>
+    <dependencies>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
         <pluginManagement>
             <plugins>
                 <plugin>

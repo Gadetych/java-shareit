@@ -78,7 +78,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.modelToDto(itemRepository.save(item));
     }
 
-    public Map<String, BookingDto> getLastAndNextBookings(List<Booking> list, LocalDateTime now) {
+    private Map<String, BookingDto> getLastAndNextBookings(List<Booking> list, LocalDateTime now) {
         Map<String, BookingDto> bookingDtoMap = new HashMap<>();
         Booking lastBookingModel = null;
         LocalDateTime last = LocalDateTime.MIN;

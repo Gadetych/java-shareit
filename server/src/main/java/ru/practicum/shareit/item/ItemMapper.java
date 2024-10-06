@@ -20,8 +20,8 @@ public class ItemMapper {
         dto.setId(model.getId());
         dto.setName(model.getName());
         dto.setDescription(model.getDescription());
-        dto.setAvailable(model.getAvailable());
         dto.setOwnerId(model.getOwnerId());
+        dto.setAvailable(model.getAvailable());
         dto.setRequestId(model.getRequestId());
         return dto;
     }
