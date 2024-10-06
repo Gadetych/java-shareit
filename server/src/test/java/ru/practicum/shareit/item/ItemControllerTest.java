@@ -2,13 +2,13 @@ package ru.practicum.shareit.item;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -27,12 +27,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ItemController.class)
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@DisabledInAotMode
 class ItemControllerTest {
-    private final MockMvc mvc;
-    private final ObjectMapper mapper;
+    @Autowired
+    private MockMvc mvc;
     @MockBean
-    private final ItemService itemService;
+    private ObjectMapper mapper;
+    @MockBean
+    private ItemService itemService;
     private final String requestHeader = "X-Sharer-User-Id";
     ItemDto itemDto1 = new ItemDto();
     ItemDto itemDto2 = new ItemDto();

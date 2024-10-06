@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
 
 class ItemMapperTest {
     private Item model = new Item(1L, "afafqe", "ascacq", 1L, true, 1L);
@@ -56,8 +55,8 @@ class ItemMapperTest {
                 .build();
         List<CommentDtoResponse> listCommentDtoResponses = List.of(commentDtoResponse);
         Map<String, BookingDto> bookingDtoMap = new HashMap<>();
-        bookingDtoMap.put("lastBooking", any());
-        bookingDtoMap.put("nextBooking", any());
+        bookingDtoMap.put("lastBooking", null);
+        bookingDtoMap.put("nextBooking", null);
         ItemWithCommentsDtoResponse result = ItemMapper.modelToDtoWithComments(model, listCommentDtoResponses, bookingDtoMap);
 
         assertNotNull(result);

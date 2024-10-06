@@ -20,12 +20,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
+    private final User model = new User(null, "QWd1d", "QWd1d@mail.ru");
+    private final UserDto dto = new UserDto(null, "QWd1d", "QWd1d@mail.ru");
     @Mock
     private UserRepository userRepositoryMock;
     @InjectMocks
     private UserServiceImpl userService;
-    private final User model = new User(null, "QWd1d", "QWd1d@mail.ru");
-    private final UserDto dto = new UserDto(null, "QWd1d", "QWd1d@mail.ru");
 
     @Test
     void shouldByIdNotExists() {
