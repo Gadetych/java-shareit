@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: test
+    active: def
   jpa:
     show-sql: true
     hibernate:
