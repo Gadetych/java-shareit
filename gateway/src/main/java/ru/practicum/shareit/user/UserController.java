@@ -29,6 +29,7 @@ public class UserController {
     private final UserClient userClient;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @Validated(Marker.Create.class)
     public ResponseEntity<Object> create(@RequestBody
                                          @Valid UserDto userDto) {

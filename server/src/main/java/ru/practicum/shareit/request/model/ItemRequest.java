@@ -26,7 +26,7 @@ import java.util.List;
 public class ItemRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String description;
     private long requestorId;
     @Column(nullable = false)

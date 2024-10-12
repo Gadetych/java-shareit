@@ -2,10 +2,10 @@ package ru.practicum.shareit.user;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
@@ -15,21 +15,37 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Transactional
 @DataJpaTest
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserRepositoryTest {
     private final EntityManager em;
     private final UserRepository userRepository;
 
+    private User user1 = new User();
+    private User user2 = new User();
+    private long id1;
+    private long id2;
     private final String name1 = "QWeqr";
     private final String email1 = "QWeqr@gmail.com";
     private final String name2 = "Nasdaf";
     private final String email2 = "Nasdaf@gmail.com";
 
+    @BeforeEach
+    void setUp() {
+        user1.setName(name1);
+        user1.setEmail(email1);
+        em.persist(user1);
+        id1 = user1.getId();
+
+        user2.setName(name2);
+        user2.setEmail(email2);
+        em.persist(user2);
+        id2 = user2.getId();
+    }
+
     @Test
     void existsById() {
-        boolean exists = userRepository.existsById(1L);
+        boolean exists = userRepository.existsById(id1);
 
         assertTrue(exists);
     }
@@ -61,50 +77,47 @@ public class UserRepositoryTest {
         assertEquals("Acxvz@gmail.com", user.getEmail());
     }
 
-    User createUser() {
-        User user = new User();
-        user.setId(2L);
-        user.setName("Acxvz");
-        user.setEmail("Acxvz@gmail.com");
-        return user;
-    }
 
     @Test
     void updateUserNameAndEmail() {
-        User user = createUser();
-        userRepository.updateUserNameAndEmail(user.getId(), user.getName(), user.getEmail());
-        User result = userRepository.findById(user.getId()).orElse(null);
+        String newName = "New_Name";
+        String newEmail = "New_Email@gmail.com";
+        userRepository.updateUserNameAndEmail(id1, newName, newEmail);
+        em.clear();
+        User result = userRepository.findById(id1).orElse(null);
 
         assertNotNull(result);
-        assertEquals(user.getName(), result.getName());
-        assertEquals(user.getEmail(), result.getEmail());
+        assertEquals(newName, result.getName());
+        assertEquals(newEmail, result.getEmail());
     }
 
     @Test
     void updateUserEmail() {
-        User user = createUser();
-        userRepository.updateUserEmail(user.getId(), user.getEmail());
-        User result = userRepository.findById(user.getId()).orElse(null);
+        String newEmail = "New_Email@gmail.com";
+        userRepository.updateUserEmail(id1, newEmail);
+        em.clear();
+        User result = userRepository.findById(id1).orElse(null);
 
         assertNotNull(result);
-        assertEquals(name2, result.getName());
-        assertEquals(user.getEmail(), result.getEmail());
+        assertEquals(name1, result.getName());
+        assertEquals(newEmail, result.getEmail());
     }
 
     @Test
     void updateUserName() {
-        User user = createUser();
-        userRepository.updateUserName(user.getId(), user.getName());
-        User result = userRepository.findById(user.getId()).orElse(null);
+        String newName = "New_Name";
+        userRepository.updateUserName(id1, newName);
+        em.clear();
+        User result = userRepository.findById(id1).orElse(null);
 
         assertNotNull(result);
-        assertEquals(user.getName(), result.getName());
-        assertEquals(email2, result.getEmail());
+        assertEquals(newName, result.getName());
+        assertEquals(email1, result.getEmail());
     }
 
     @Test
     void get() {
-        User user = userRepository.findById(1L).orElse(null);
+        User user = userRepository.findById(id1).orElse(null);
 
         assertNotNull(user);
         assertEquals(name1, user.getName());
@@ -118,7 +131,7 @@ public class UserRepositoryTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(result.size(), 2);
-        assertEquals(result.getFirst().getId(), 1L);
-        assertEquals(result.getLast().getId(), 2L);
+        assertEquals(result.getFirst().getId(), id1);
+        assertEquals(result.getLast().getId(), id2);
     }
 }

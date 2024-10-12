@@ -7,16 +7,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -30,7 +36,7 @@ class UserServiceImplTest {
     @Test
     void shouldByIdNotExists() {
         long id = 2L;
-        Mockito.when(userRepositoryMock.existsById(id))
+        when(userRepositoryMock.existsById(id))
                 .thenReturn(false);
 
         final NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> userService.exists(id));
@@ -41,7 +47,7 @@ class UserServiceImplTest {
     @Test
     void shouldByEmailNotExists() {
         String email = "test@test.com";
-        Mockito.when(userRepositoryMock.existsByUserEmail(email))
+        when(userRepositoryMock.existsByUserEmail(email))
                 .thenReturn(true);
 
         final EmailAlreadyExistException exception = Assertions.assertThrows(EmailAlreadyExistException.class, () -> userService.exists(email));
@@ -51,7 +57,7 @@ class UserServiceImplTest {
 
     @Test
     void save() {
-        Mockito.when(userRepositoryMock.save(model))
+        when(userRepositoryMock.save(model))
                 .thenAnswer(invocation -> {
                     model.setId(1L);
                     return model;
@@ -64,7 +70,7 @@ class UserServiceImplTest {
 
     @Test
     void notSaveBecauseEmailAlreadyExists() {
-        Mockito.when(userRepositoryMock.existsByUserEmail(dto.getEmail()))
+        when(userRepositoryMock.existsByUserEmail(dto.getEmail()))
                 .thenReturn(true);
 
         EmailAlreadyExistException exception = Assertions.assertThrows(EmailAlreadyExistException.class, () -> userService.save(dto));
@@ -74,11 +80,11 @@ class UserServiceImplTest {
     private void setMocks() {
         dto.setId(2L);
         model.setId(2L);
-        Mockito.when(userRepositoryMock.existsById(dto.getId()))
+        when(userRepositoryMock.existsById(dto.getId()))
                 .thenReturn(true);
-        Mockito.when(userRepositoryMock.existsByUserEmail(dto.getEmail()))
+        when(userRepositoryMock.existsByUserEmail(dto.getEmail()))
                 .thenReturn(false);
-        Mockito.when(userRepositoryMock.findById(dto.getId()))
+        when(userRepositoryMock.findById(dto.getId()))
                 .thenReturn(Optional.of(model));
     }
 
@@ -126,5 +132,20 @@ class UserServiceImplTest {
 
         Mockito.verify(userRepositoryMock, Mockito.times(0))
                 .updateUserNameAndEmail(anyLong(), anyString(), anyString());
+    }
+
+    @Test
+    void getALl() {
+        when(userRepositoryMock.findAll(any(Sort.class))).thenReturn(new ArrayList<>());
+        List<UserDto> result = userService.getAll();
+
+        assertNotNull(result);
+    }
+
+    @Test
+    void deleteUser() {
+        userService.delete(dto.getId());
+
+        Mockito.verify(userRepositoryMock, Mockito.times(1)).deleteById(dto.getId());
     }
 }

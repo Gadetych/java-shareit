@@ -7,10 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = UserController.class)
-@DisabledInAotMode
 class UserControllerTest {
     private final String baseUri = "/users";
     private final String idUri = "/";
@@ -120,5 +119,15 @@ class UserControllerTest {
         performMvcGet(baseUri + idUri + dto.getId())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message", is("User not found with id: " + dto.getId())));
+    }
+
+    @Test
+    void getALl() throws Exception {
+        performMvcGet(baseUri).andExpect(status().isOk());
+    }
+
+    @Test
+    void delete() throws Exception {
+        mvc.perform(setRequestHeaders(MockMvcRequestBuilders.delete(baseUri + "/" + dto.getId()))).andExpect(status().isNoContent());
     }
 }

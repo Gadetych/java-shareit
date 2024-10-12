@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.comment.dto.CommentDtoCreate;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithCommentsDtoResponse;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserMapper;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -362,5 +364,60 @@ class ItemServiceImplTest {
                 .thenReturn(list);
 
         assertThrows(NotValidException.class, () -> itemService.createComment(commentDtoCreate, authorId, itemId));
+    }
+
+    @Test
+    void findAllItemsByOwnerId() {
+        List<Item> items = List.of(itemModel);
+        when(itemRepository.findAllItemsByOwnerId(anyLong())).thenReturn(items);
+
+        User booker = new User(1L, "test", "test");
+
+        LocalDateTime now = LocalDateTime.now();
+        Booking booking1 = new Booking();
+        booking1.setId(1L);
+        booking1.setStart(now.plusHours(1));
+        booking1.setEnd(now.plusHours(2));
+        booking1.setItem(itemModel);
+        booking1.setBooker(booker);
+        List<Booking> bookings = List.of(booking1);
+        when(bookingRepository.findAllByItemOwnerIdAndEndBeforeOrderByEndDesc(anyLong(), any())).thenReturn(bookings);
+
+        String textComment = "comment";
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setText(textComment);
+        comment.setAuthor(booker);
+        comment.setItem(itemModel);
+        comment.setCreated(now);
+        List<Comment> comments = List.of(comment);
+        when(commentRepository.findAllByItemOwnerId(anyLong())).thenReturn(comments);
+
+        List<ItemWithCommentsDtoResponse> result = itemService.findAllItemsByOwnerId(itemDto.getOwnerId());
+
+        assertEquals(1, result.size());
+        assertNotNull(result.getFirst().getComments());
+
+    }
+
+    @Test
+    void getItemWithComments() {
+        when(itemRepository.existsById(anyLong())).thenReturn(true);
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(itemModel));
+        User user = new User(1L, "test", "test");
+        String textComment = "comment";
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setText(textComment);
+        comment.setAuthor(user);
+        comment.setItem(itemModel);
+        comment.setCreated(LocalDateTime.now());
+        List<Comment> comments = List.of(comment);
+        when(commentRepository.findAllByItemIdOrderById(anyLong())).thenReturn(comments);
+
+        ItemWithCommentsDtoResponse result = itemService.getItemWithComments(itemModel.getId(), itemModel.getOwnerId());
+
+        assertNotNull(result);
+        assertNotNull(result.getComments());
     }
 }
