@@ -1,0 +1,29 @@
+server:
+  port: 9090
+
+spring:
+  profiles:
+    active: def
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: always
+
+
+logging:
+  level:
+    ru:
+      practicum: DEBUG
+    org:
+      springframework:
+        orm:
+          jpa: INFO
+        transaction:
+          interceptor: TRACE
+          JpaTransactionManager: DEBUG
